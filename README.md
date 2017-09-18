@@ -11,12 +11,12 @@ We recommend installing this package with [Composer](http://getcomposer.org/).
 Run in your project root:
 
 ```
-composer require flipminds/gotowebinar:@dev
+composer require flipminds/gotowebinar:~1.0.0
 ```
 ## Simple Usage ## 
 
 ```php
-use FlipMinds/GotoWebinar;
+use FlipMinds\GotoWebinar\GotoWebinar;
   
 $credentials = [
     'username' => ''
@@ -43,18 +43,18 @@ See the examples folder for more usages examples.
 
 By default GotoWebinar Authentication Tokens are valid for 356 days. Caching the token result in one less round trip to GotoWebinar servers.  
 
-You can use the `getAuth()` method call to retrieve an array of data that can be cached. You can use this array as a second argument to the constructor. 
+You can use the `getAuth()` method call to retrieve an array of data that can be cached. You can use this array as a second argument to the constructor.
+
+You can also set a callback to capture the authentication array after authenticating with GotoWebinar servers.  
 
 ```php
-$gtw = new GotoWebinar($credentials); // see Above
+
+// $auth =  getfromcache()
+   
+$gtw = new GotoWebinar($credentials, $auth); // see Above
  
-$auth = $gtw->getAuth();
-```
-
-`$auth` can now be stored for later use.
-
-```php
-$auth = getFileFromCache(); // your function call. 
-
-$gtw = new GotoWebinar($credentials, $auth); 
+$gtw->setAuthCallback(function($auth) {
+ // save $auth to cache 
+});
+ 
 ```
