@@ -199,9 +199,9 @@ class GotoWebinar
 	/**
 	 * Send a request to the GotoWebinar API
 	 *
-	 * @param $method string  GET, POST, PUT, DELETE
-	 * @param $uri string  uri endpoint
-	 * @param $options see Guzzle documentation
+	 * @param string $method GET, POST, PUT, DELETE
+	 * @param string $uri API endpoint
+	 * @param array $options see Guzzle documentation
 	 * @param bool $authenticated bool Send the auth header (set to false during authentication calls)
 	 * @return bool|mixed
 	 */
@@ -232,8 +232,8 @@ class GotoWebinar
 	 * Retrieves the list of webinars for an account within a given date range. Page and size
 	 * parameters are optional. Default page is 0 and default size is 20.
 	 *
-	 * @param $fromTime A required start of datetime range in ISO8601 UTC format, e.g. 2015-07-13T10:00:00Z
-	 * @param $toTime A required end of datetime range in ISO8601 UTC format, e.g. 2015-07-13T22:00:00Z
+	 * @param string $fromTime A required start of datetime range in ISO8601 UTC format, e.g. 2015-07-13T10:00:00Z
+	 * @param string $toTime A required end of datetime range in ISO8601 UTC format, e.g. 2015-07-13T22:00:00Z
 	 * @param int $page The page number to be displayed. The first page is 0.
 	 * @param int $size The size of the page.
 	 * @return bool|mixed
@@ -244,7 +244,7 @@ class GotoWebinar
 			'GET',
 			'accounts/' . $this->getAccountKey() . '/webinars',
 			[
-				'query' => get_defined_vars(),
+				'query' => compact('fromTime', 'toTime', 'page', 'size'),
 			]
 		);
 	}
@@ -255,8 +255,8 @@ class GotoWebinar
 	 * Returns details for completed webinars for the specified organizer and completed webinars of
 	 * other organizers where the specified organizer is a co-organizer.
 	 *
-	 * @param $fromTime A required start of datetime range in ISO8601 UTC format, e.g. 2015-07-13T10:00:00Z
-	 * @param $toTime A required end of datetime range in ISO8601 UTC format, e.g. 2015-07-13T22:00:00Z
+	 * @param string $fromTime A required start of datetime range in ISO8601 UTC format, e.g. 2015-07-13T10:00:00Z
+	 * @param string $toTime A required end of datetime range in ISO8601 UTC format, e.g. 2015-07-13T22:00:00Z
 	 * @return bool|mixed
 	 */
 	public function getHistoricalWebinars($fromTime, $toTime)
@@ -265,7 +265,7 @@ class GotoWebinar
 			'GET',
 			'organizers/' . $this->getOrganizerKey() . '/historicalWebinars',
 			[
-				'query' => get_defined_vars(),
+				'query' => compact('fromTime', 'toTime'),
 			]
 		);
 	}
@@ -317,9 +317,24 @@ class GotoWebinar
 	 * the password to the webinar, and send the password to the registrants. The response provides a numeric webinarKey in string format
 	 * for the new webinar. Once a webinar has been created with this method, you can accept registrations.
 	 *
-	 * @param string $subject
-	 * @param string $description
-	 * @param array $times
+	 *
+	 * Here is an example of teh $times array
+	 *
+	 * ```php
+	 * $startTime = new DateTime('next Tuesday 9:00pm');
+	 * $endTime = new DateTime('next Tuesday 10:00pm');
+	 *
+	 * $times = [
+	 *        (object) [
+	 *        'startTime' => $startTime->format('Y-m-d\TH:i:s\Z'),
+	 *        'endTime' => $startTime->format('Y-m-d\TH:i:s\Z'),
+	 *        ]
+	 * ];
+	 * ```
+	 *
+	 * @param string $subject Subject of the webinar
+	 * @param string $description Webinar description
+	 * @param array $times arrayt containing multiple startTime and endTime
 	 * @param string $timeZone
 	 * @param string $type
 	 * @param bool $isPasswordProtected
@@ -331,7 +346,7 @@ class GotoWebinar
 			'POST',
 			'organizers/' . $this->getOrganizerKey() . '/webinars',
 			[
-				'json' => get_defined_vars(),
+				'json' => compact('subject', 'description', 'times', 'timeZone', 'type', 'single_session', 'isPasswordProtected'),
 			]
 		);
 	}
@@ -366,7 +381,7 @@ class GotoWebinar
 	 * Webinars of type 'series' are treated the same as normal webinars - each session in the webinar series has a different webinarKey.
 	 * If an organizer cancels a webinar, then a request to get that webinar would return a '404 Not Found' error.
 	 *
-	 * @param $webinarKey The key of the webinar
+	 * @param string $webinarKey The key of the webinar
 	 * @return bool|mixed
 	 */
 	public function getWebinar($webinarKey)
@@ -414,7 +429,7 @@ class GotoWebinar
 	 *
 	 * Returns all attendees for all sessions of the specified webinar.
 	 *
-	 * @param $webinarKey The key of the webinar
+	 * @param string $webinarKey The key of the webinar
 	 * @return bool|mixed
 	 */
 	public function getAttendees($webinarKey)
@@ -431,7 +446,7 @@ class GotoWebinar
 	 *
 	 * Retrieves the audio/conferencing information for a specific webinar.
 	 *
-	 * @param $webinarKey The key of the webinar
+	 * @param string $webinarKey The key of the webinar
 	 * @return bool|mixed
 	 */
 	public function getAudio($webinarKey)
@@ -447,7 +462,7 @@ class GotoWebinar
 	 *
 	 * Updates the audio/conferencing settings for a specific webinar
 	 *
-	 * @param $webinarKey string The key of the webinar
+	 * @param string $webinarKey string The key of the webinar
 	 * @param $type  string Indicates how to connect to the webinar's audio conference = ['PSTN', 'VOIP', 'Hybrid', 'Private'],
 	 * @param $pstnInfo array Defines via two-letter Alpha-2-code which toll and toll-free PSTN numbers are available per country
 	 * @param $privateInfo array Defines the audio data for an own conferencing system
@@ -471,7 +486,7 @@ class GotoWebinar
 	 *
 	 * Retrieves the meeting times for a webinar.
 	 *
-	 * @param $webinarKey  The key of the webinar
+	 * @param string $webinarKey The key of the webinar
 	 * @return bool|mixed
 	 */
 	public function getMeetingTimes($webinarKey)
@@ -487,7 +502,7 @@ class GotoWebinar
 	 *
 	 * Gets performance details for all sessions of a specific webinar.
 	 *
-	 * @param $webinarKey
+	 * @param string $webinarKey
 	 * @return bool|mixed
 	 */
 	public function getPerformance($webinarKey)
@@ -503,8 +518,8 @@ class GotoWebinar
 	 *
 	 * Retrieve all completed sessions of all the webinars of a given organizer.
 	 *
-	 * @param $fromTime string A required start of datetime range in ISO8601 UTC format, e.g. 2015-07-13T10:00:00Z
-	 * @param $toTime  string A required end of datetime range in ISO8601 UTC format, e.g. 2015-07-13T22:00:00Z
+	 * @param $fromTime A required start of datetime range in ISO8601 UTC format, e.g. 2015-07-13T10:00:00Z
+	 * @param $toTime  A required end of datetime range in ISO8601 UTC format, e.g. 2015-07-13T22:00:00Z
 	 * @return bool|mixed
 	 */
 	public function getOrganizerSessions($fromTime, $toTime)
@@ -513,7 +528,7 @@ class GotoWebinar
 			'GET',
 			'organizers/' . $this->getOrganizerKey() . '/sessions',
 			[
-				'query' => get_defined_vars(),
+				'query' => compact('fromTime', 'toTime'),
 			]
 		);
 	}
@@ -523,7 +538,7 @@ class GotoWebinar
 	 *
 	 * Retrieves details for all past sessions of a specific webinar.
 	 *
-	 * @param $webinarKey
+	 * @param string $webinarKey
 	 * @return bool|mixed
 	 */
 	public function getSessions($webinarKey)
@@ -541,8 +556,8 @@ class GotoWebinar
 	 * the session ('registrantsAttended'), specific attendance details, such as attendenceTime for a
 	 * registrant, will also be retrieved.
 	 *
-	 * @param $webinarKey
-	 * @param $sessionKey
+	 * @param string $webinarKey
+	 * @param string $sessionKey
 	 * @return bool|mixed
 	 */
 	public function getSession($webinarKey, $sessionKey)
@@ -558,8 +573,8 @@ class GotoWebinar
 	 *
 	 * Get performance details for a session.
 	 *
-	 * @param $webinarKey
-	 * @param $sessionKey
+	 * @param string $webinarKey
+	 * @param string $sessionKey
 	 * @return bool|mixed
 	 */
 	public function getSessionPerformance($webinarKey, $sessionKey)
@@ -575,8 +590,8 @@ class GotoWebinar
 	 *
 	 * Retrieve all collated attendee questions and answers for polls from a specific webinar session.
 	 *
-	 * @param $webinarKey
-	 * @param $sessionKey
+	 * @param string $webinarKey
+	 * @param string $sessionKey
 	 * @return bool|mixed
 	 */
 	public function getSessionPolls($webinarKey, $sessionKey)
@@ -592,8 +607,8 @@ class GotoWebinar
 	 *
 	 * Retrieve questions and answers for a past webinar session.
 	 *
-	 * @param $webinarKey
-	 * @param $sessionKey
+	 * @param string $webinarKey
+	 * @param string $sessionKey
 	 * @return bool|mixed
 	 */
 	public function getSessionQuestions($webinarKey, $sessionKey)
@@ -609,8 +624,8 @@ class GotoWebinar
 	 *
 	 * Retrieve surveys for a past webinar session.
 	 *
-	 * @param $webinarKey
-	 * @param $sessionKey
+	 * @param string $webinarKey
+	 * @param string $sessionKey
 	 * @return bool|mixed
 	 */
 	public function getSessionSurveys($webinarKey, $sessionKey)
@@ -630,7 +645,7 @@ class GotoWebinar
 	 * that do not have a GoToWebinar account are returned as external co-organizers. For those organizers no surname
 	 * is returned.
 	 *
-	 * @param $webinarKey
+	 * @param string $webinarKey
 	 * @return bool|mixed
 	 */
 	public function getCoOrganizers($webinarKey)
@@ -651,11 +666,11 @@ class GotoWebinar
 	 * In this case you have to pass the parameters 'givenName' and 'email'. Since there is no parameter for
 	 * 'surname' you should pass first and last name to the parameter 'givenName'.
 	 *
-	 * @param $webinarKey  string The key of the webinar
-	 * @param $external bool If the co-organizer has no GoToWebinar account, this value has to be set to 'true' ,
-	 * @param $organizerKey string The co-organizer's organizer key. This parameter has to be passed only, if 'external' is set to 'false' ,
-	 * @param $givenName string The co-organizer's given name. This parameter has to be passed only, if 'external' is set to 'true'
-	 * @param $email string The co-organizer's email address. This parameter has to be passed only, if 'external' is set to 'true'
+	 * @param string $webinarKey The key of the webinar
+	 * @param bool $external If the co-organizer has no GoToWebinar account, this value has to be set to 'true' ,
+	 * @param string $organizerKey The co-organizer's organizer key. This parameter has to be passed only, if 'external' is set to 'false' ,
+	 * @param string $givenName The co-organizer's given name. This parameter has to be passed only, if 'external' is set to 'true'
+	 * @param string $email The co-organizer's email address. This parameter has to be passed only, if 'external' is set to 'true'
 	 * @return bool|mixed
 	 */
 	public function createCoOrganizers($webinarKey, $external, $organizerKey, $givenName, $email)
@@ -675,10 +690,10 @@ class GotoWebinar
 	 *
 	 * Deletes an internal co-organizer specified by the coorganizerKey (memberKey).
 	 *
-	 * @param $webinarKey string The key of the webinar
-	 * @param $coorganiserKey The key of the internal or external co-organizer (memberKey)
-	 * @param $external bool By default only internal co-organizers (with a GoToWebinar account) can be deleted. If you want to use this call for external
-	 *                         co-organizers you have to set this parameter to 'true'.
+	 * @param string $webinarKey The key of the webinar
+	 * @param string $coorganiserKey The key of the internal or external co-organizer (memberKey)
+	 * @param bool $external By default only internal co-organizers (with a GoToWebinar account) can be deleted. If you want to use this call for external
+	 * 		co-organizers you have to set this parameter to 'true'.
 	 * @return bool|mixed
 	 */
 	public function deleteCoOrganizers($webinarKey, $coorganiserKey, $external)
@@ -698,9 +713,9 @@ class GotoWebinar
 	 *
 	 * Resends an invitation email to the specified co-organizer
 	 *
-	 * @param $webinarKey string The key of the webinar
-	 * @param $coorganiserKey The key of the internal or external co-organizer (memberKey)
-	 * @param $external bool By default only internal co-organizers (with a GoToWebinar account) can be deleted. If you want to use this call for external
+	 * @param string $webinarKey The key of the webinar
+	 * @param string $coorganiserKey The key of the internal or external co-organizer (memberKey)
+	 * @param bool $external By default only internal co-organizers (with a GoToWebinar account) can be deleted. If you want to use this call for external
 	 *                         co-organizers you have to set this parameter to 'true'.
 	 * @return bool|mixed
 	 */
@@ -721,7 +736,7 @@ class GotoWebinar
 	 *
 	 * Retrieves all the panelists for a specific webinar.
 	 *
-	 * @param $webinarKey
+	 * @param string $webinarKey
 	 * @return bool|mixed
 	 */
 	public function getPanelists($webinarKey)
@@ -737,8 +752,8 @@ class GotoWebinar
 	 *
 	 * Create panelists for a specified webinar
 	 *
-	 * @param $webinarKey The key of the webinar
-	 * @param $panelists array an array of panelists ('name','email');
+	 * @param string $webinarKey The key of the webinar
+	 * @param array $panelists An array of panelists ('name','email');
 	 * @return bool|mixed
 	 */
 	public function createPanelist($webinarKey, array $panelists)
@@ -758,8 +773,8 @@ class GotoWebinar
 	 *
 	 * Removes a webinar panelist.
 	 *
-	 * @param $webinarKey string The key of the webinar
-	 * @param $panelistKey The key of the webinar panelist
+	 * @param string $webinarKey string The key of the webinar
+	 * @param string $panelistKey The key of the webinar panelist
 	 * @return bool|mixed
 	 */
 	public function deletePanelist($webinarKey, $panelistKey)
@@ -776,8 +791,8 @@ class GotoWebinar
 	 *
 	 * Resends an invitation email to the specified panelist
 	 *
-	 * @param $webinarKey string The key of the webinar
-	 * @param $panelistKey The key of the webinar panelist
+	 * @param string $webinarKey string The key of the webinar
+	 * @param string $panelistKey The key of the webinar panelist
 	 * @return bool|mixed
 	 */
 	public function resendPanelistInvitation($webinarKey, $panelistKey)
@@ -799,7 +814,7 @@ class GotoWebinar
 	 * APPROVED - registrant registered and is approved, and
 	 * DENIED - registrant registered and was denied.
 	 *
-	 * @param $webinarKey
+	 * @param string $webinarKey
 	 * @return bool|mixed
 	 */
 	public function getRegistrants($webinarKey)
@@ -853,8 +868,8 @@ class GotoWebinar
 	 * Removes a webinar registrant from current registrations for the specified webinar. The webinar must be
 	 * a scheduled, future webinar.
 	 *
-	 * @param $webinarKey
-	 * @param $registrantKey
+	 * @param string $webinarKey
+	 * @param string $registrantKey
 	 * @return bool|mixed
 	 */
 	public function deleteRegistrant($webinarKey, $registrantKey)
@@ -871,8 +886,8 @@ class GotoWebinar
 	 *
 	 * Retrieve registration details for a specific registrant.
 	 *
-	 * @param $webinarKey
-	 * @param $registrantKey
+	 * @param string $webinarKey
+	 * @param string $registrantKey
 	 * @return bool|mixed
 	 */
 	public function getRegistrant($webinarKey, $registrantKey)
@@ -889,7 +904,7 @@ class GotoWebinar
 	 *
 	 * Retrieve required, optional registration, and custom questions for a specified webinar.
 	 *
-	 * @param $webinarKey
+	 * @param string $webinarKey
 	 * @return bool|mixed
 	 */
 	public function getRegistrationFields($webinarKey)
@@ -923,9 +938,9 @@ class GotoWebinar
 	 *
 	 * Retrieve registration details for a particular attendee of a specific webinar session.
 	 *
-	 * @param $webinarKey
-	 * @param $sessionKey
-	 * @param $registrantKey
+	 * @param string $webinarKey
+	 * @param string $sessionKey
+	 * @param string $registrantKey
 	 * @return bool|mixed
 	 */
 	public function getSessionAttendee($webinarKey, $sessionKey, $registrantKey)
@@ -941,9 +956,9 @@ class GotoWebinar
 	 *
 	 * Get poll answers from a particular attendee of a specific webinar session.
 	 *
-	 * @param $webinarKey
-	 * @param $sessionKey
-	 * @param $registrantKey
+	 * @param string $webinarKey
+	 * @param string $sessionKey
+	 * @param string $registrantKey
 	 * @return bool|mixed
 	 */
 	public function getSessionAttendeePolls($webinarKey, $sessionKey, $registrantKey)
@@ -960,9 +975,9 @@ class GotoWebinar
 	 *
 	 * Get questions asked by an attendee during a webinar session.
 	 *
-	 * @param $webinarKey
-	 * @param $sessionKey
-	 * @param $registrantKey
+	 * @param string $webinarKey
+	 * @param string $sessionKey
+	 * @param string $registrantKey
 	 * @return bool|mixed
 	 */
 	public function getSessionAttendeeQuestions($webinarKey, $sessionKey, $registrantKey)
@@ -978,9 +993,9 @@ class GotoWebinar
 	 *
 	 * Retrieve survey answers from a particular attendee during a webinar session
 	 *
-	 * @param $webinarKey
-	 * @param $sessionKey
-	 * @param $registrantKey
+	 * @param string $webinarKey
+	 * @param string $sessionKey
+	 * @param string $registrantKey
 	 * @return bool|mixed
 	 */
 	public function getSessionAttendeeSurveys($webinarKey, $sessionKey, $registrantKey)
