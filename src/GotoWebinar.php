@@ -55,6 +55,14 @@ class GotoWebinar
 	private $client;
 
 	/**
+	 * Callback function when authenticated.
+	 *
+	 * @since 1.0.2
+	 * @var Callable
+	 */
+	private $authCallback;
+
+	/**
 	 * GotoWebinar constructor.
 	 *
 	 * Pass in two arrays. The first $credentials contains the username, password andConsumerKey. The second is an auth array that could have
@@ -92,11 +100,33 @@ class GotoWebinar
 		]);
 	}
 
+	/**
+	 * Sets the callback once authenticated
+	 *
+	 * @param callable $callable
+	 */
+	public function setAuthCallback(callable $callable)
+	{
+		$this->authCallback = $callable;
+	}
+
+	/**
+	 * Return the guzzle client
+	 *
+	 * @return Client
+	 */
 	private function getClient()
 	{
 		return $this->client;
 	}
 
+
+	/**
+	 * Authenticate with credentials (if needed)
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
 	private function authenticate()
 	{
 		$auth = $this->auth;
@@ -133,6 +163,11 @@ class GotoWebinar
 			'organizerKey' => $response->organizer_key,
 			'accountKey'   => $response->account_key,
 		];
+
+		// Fire a callback
+		if ($this->authCallback && is_callable($this->authCallback)) {
+			call_user_func($this->authCallback, $this->auth);
+		}
 
 		return $response->access_token;
 	}
@@ -693,7 +728,7 @@ class GotoWebinar
 	 * @param string $webinarKey The key of the webinar
 	 * @param string $coorganiserKey The key of the internal or external co-organizer (memberKey)
 	 * @param bool $external By default only internal co-organizers (with a GoToWebinar account) can be deleted. If you want to use this call for external
-	 * 		co-organizers you have to set this parameter to 'true'.
+	 *        co-organizers you have to set this parameter to 'true'.
 	 * @return bool|mixed
 	 */
 	public function deleteCoOrganizers($webinarKey, $coorganiserKey, $external)
