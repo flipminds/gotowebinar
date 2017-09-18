@@ -21,7 +21,7 @@ use FlipMinds\GotoWebinar\GotoWebinar;
 $credentials = [
     'username' => ''
     'password' => ''
-    'apiKey' => ''
+    'consumerKey' => ''
 ];
  
 $gtw = new GotoWebinar($credentials);
