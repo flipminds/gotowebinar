@@ -2,6 +2,7 @@
     "name": "flipminds/gotowebinar",
     "description": "GotoWebinar REST API wrapper. Uses the new api.getgo.com/G2W/rest endpoint",
     "type": "library",
+    "keywords" : ["GotoWebinar", "API"],
     "license": "MIT",
     "authors": [
         {
