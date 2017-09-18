@@ -1,0 +1,22 @@
+{
+    "name": "flipminds/gotowebinar",
+    "description": "GotoWebinar REST API wrapper. Uses the new api.getgo.com/G2W/rest endpoint",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sunil Jaiswal",
+            "email": "sunil@flipminds.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.1.0",
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "autoload": {
+    "psr-4": {
+      "FlipMinds\\GotoWebinar\\": "src/"
+    }
+  }
+}

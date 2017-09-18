@@ -1,0 +1,7 @@
+.idea
+vendor
+error_log
+cgi-bin
+.well-known
+composer.lock
+examples/config.php
