@@ -25,13 +25,25 @@ $webinar = $gtw->createWebinar(
 print "<pre>";
 print "createWebinar : ({$gtw->getStatusCode()} {$gtw->getReasonPhrase()})\n";
 print_r($webinar);
-
 $key = $webinar->webinarKey;
-$result = $gtw->createRegistrant($key,'firstname','lastname','firstname@lastname.com');
 
+$result = $gtw->createRegistrant($key,'firstname','lastname','firstname@lastname.com');
 print "createRegistrant : ({$gtw->getStatusCode()} {$gtw->getReasonPhrase()})\n";
 print_r($result);
 $registrantKey = $result->registrantKey;
-$join_url = $result->joinUrl;
 
+$result = $gtw->getRegistrants($key);
+print "getRegistrants : ({$gtw->getStatusCode()} {$gtw->getReasonPhrase()})\n";
+print_r($result);
 
+$result = $gtw->deleteRegistrant($key,$registrantKey);
+print "deleteRegistrants : ({$gtw->getStatusCode()} {$gtw->getReasonPhrase()})\n";
+print_r($result);
+
+$result = $gtw->getRegistrants($key);
+print "getRegistrants : ({$gtw->getStatusCode()} {$gtw->getReasonPhrase()})\n";
+print_r($result);
+
+$result = $gtw->cancelWebinar($key);
+print "cancelWebinar : ({$gtw->getStatusCode()} {$gtw->getReasonPhrase()})\n";
+print_r($result);
